@@ -8,13 +8,21 @@
   become: true
   tasks:
 
+  ## Basic Setup ##
   - name: Install vim
     apt: name=vim state=latest
   - name: Install unattended-upgrades
     apt: name=unattended-upgrades state=latest
   - name: Install apt-listchanges
     apt: name=apt-listchanges state=latest
+  - name: install bash aliases
+    template:
+      src: config/bash_aliases
+      dest: /home/pi/.bash_aliases
+      owner: pi
+      group: pi
 
+  ### InfluxDB ##
   - name: Check influxdb version number
     command: bash -c "if [ -f /usr/bin/influx ]; then influx --version || grep {{ influxdb_version }}; fi"
     register: current_influxdb_version
