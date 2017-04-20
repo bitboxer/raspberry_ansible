@@ -3,6 +3,7 @@
   vars:
     influxdb_version: 1.2.2
     influxdb_password: hous3inth3country
+    grafana_version: 4.2.0
   remote_user: pi
   become_user: root
   become: true
@@ -53,6 +54,26 @@
       dest: /etc/influxdb/influxdb.conf
     notify:
       - restart influxdb
+
+  ## grafana ##
+
+  - name: Check grafana version number
+    command: bash -c "if [ -f /usr/sbin/grafana-cli ]; then grafana-cli --version || grep {{ grafana_version }}; fi"
+    register: current_grafana_version
+  - name: Install adduser
+    apt: name=adduser state=latest
+  - name: Install libfontconfig
+    apt: name=libfontconfig state=latest
+  - name: Download and install grafana
+    command: "{{ item }}"
+    with_items:
+      - wget https://github.com/fg2it/grafana-on-raspberry/releases/download/v{{ grafana_version }}/grafana_{{ grafana_version }}_armhf.deb -O /tmp/grafana_{{ grafana_version }}_armhf.deb
+      - dpkg -i /tmp/grafana_{{ grafana_version }}_armhf.deb
+      - rm /tmp/grafana_{{ grafana_version }}_armhf.deb
+      - update-rc.d grafana-server defaults
+      - update-rc.d grafana-server enable
+      - service grafana-server start
+    when: current_grafana_version.stdout.find('Grafana') == -1
 
   handlers:
     - name: restart influxdb
