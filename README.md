@@ -11,7 +11,7 @@ Steps to install it on your machine:
   * Select the non ui version of raspbian
   * Wait till it is installed and login using `pi` and `raspberry` as password
   * Activate ssh as described [here](https://www.raspberrypi.org/documentation/remote-access/ssh/README.md).
-  * Add your ssh key to the `.ssh/autorized_keys` file on the Raspberry
+  * Add your ssh key to the `.ssh/authorized_keys` file on the Raspberry
 * Setup and run [ansible](http://ansible.com) on your computer to install everything on the Raspberry:
   * Change the IP in the [`hosts`](hosts) file to the IP of your Raspberry
   * Install ansible with `brew install ansible`
