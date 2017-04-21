@@ -1,22 +1,21 @@
 # Bodos Raspberry PI
 
-This is the configuration for my raspberry pi.
+This is the configuration for my Raspberry PI.
 
 Steps to install it on your machine:
 
-* Install [NOOBS](https://github.com/procount/noobsconfig/) on the Raspberry Pi
+* Install [NOOBS](https://github.com/procount/noobsconfig/) on the Raspberry
 * Select the non ui version of raspbian
 * Wait till it is installed and login using `pi` and `raspberry` as password
 * Activate ssh as described [here](https://www.raspberrypi.org/documentation/remote-access/ssh/README.md).
 * Add your ssh key to the `.ssh/autorized_keys` file on the Raspberry
-* Configure your IP in the `hosts` file
+* Change the IP in the [`hosts`](hosts) file to the IP of your Raspberry
 * Install ansible with `brew install ansible`
 * `sh run.sh`
-* Now you have influxdb and grafana installed on the machine
-* Open `http://[yourip]:3000` to see the grafana
-* Now you can create a username and configure the
-  InfluxDB connection. The InfluxDB password
-  can be found in the `playbook.yml`
+* Now you have [InfluxDB](https://docs.influxdata.com/influxdb) and [Grafana](http://grafana.org/) installed on the machine
+* Open `http://[yourip]:3000` to see the Grafana interface and go through the
+  wizard to configure the database connection (the InfluxDB password can be
+  found in the `playbook.yml`)
 
 And now you need some data to put into your influxdb to make it
 worth it. For example you could build a small air pollution sensor for around
