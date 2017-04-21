@@ -1,6 +1,6 @@
 # Bodos Raspberry PI
 
-This is my configuration for my raspberry pi.
+This is the configuration for my raspberry pi.
 
 Steps to install it on your machine:
 
@@ -17,3 +17,7 @@ Steps to install it on your machine:
 * Now you can create a username and configure the
   InfluxDB connection. The InfluxDB password
   can be found in the `playbook.yml`
+
+And now you need some data to put into your influxdb to make it
+worth it. For example you could build a small air pollution sensor for around
+30€ that pushes data into it. Details can be found [here](http://luftdaten.info/).
