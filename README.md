@@ -15,8 +15,10 @@ Steps to install it on your machine:
 * Setup and run [ansible](http://ansible.com) on your computer to install everything on the Raspberry:
   * Change the IP in the [`hosts`](hosts) file to the IP of your Raspberry
   * Install ansible with `brew install ansible`
-  * `sh run.sh`
-  * Now you have [InfluxDB](https://docs.influxdata.com/influxdb) and [Grafana](http://grafana.org/) installed on the Raspberry.
+  * `sh run.sh` (this will take a bit of time, especially the ruby build)
+  * Now you have [InfluxDB](https://docs.influxdata.com/influxdb),
+    [Grafana](http://grafana.org/) and
+    [Ruby](http:/www.ruby-lang.org) installed on the Raspberry.
   * Open `http://[raspberryip]:3000` to see the Grafana interface and go through the
     wizard to configure the database connection (the InfluxDB password can be
     found in the `playbook.yml`)

@@ -1,0 +1,31 @@
+---
+- name: Check influxdb version number
+  command: bash -c "if [ -f /usr/bin/influx ]; then influx --version || grep {{ influxdb_version }}; fi"
+  register: current_influxdb_version
+- name: Add influxdb group
+  group: name=influxdb state=present
+- name: Add influxdb user
+  user: name=influxdb group=influxdb state=present
+- name: create influxdb pid folder
+  file: path=/var/run/influxdb state=directory mode=0777
+- name: Download and install influxdb
+  command: "{{ item }}"
+  with_items:
+    - wget https://dl.influxdata.com/influxdb/releases/influxdb-{{ influxdb_version }}_linux_armhf.tar.gz -O /tmp/influxdb.tar.gz
+    - "tar xvfz /tmp/influxdb.tar.gz --strip-components=2 -C /"
+    - rm /tmp/influxdb.tar.gz
+    - rm -rf /tmp/influxdb-{{ influxdb_version }}
+    - ln -s -f /usr/lib/influxdb/scripts/init.sh /etc/init.d/influxdb
+    - chmod +x /etc/init.d/influxdb
+    - chown -R influxdb:influxdb /var/lib/influxdb
+    - update-rc.d influxdb defaults
+    - update-rc.d influxdb enable
+    - /etc/init.d/influxdb start
+    - "influx -execute \"CREATE USER admin WITH PASSWORD \'{{ influxdb_password }}\' WITH ALL PRIVILEGES;\""
+  when: current_influxdb_version.stdout.find('InfluxDB') == -1
+- name: install influxdb config
+  template:
+    src: config/influxdb.conf
+    dest: /etc/influxdb/influxdb.conf
+  notify:
+    - restart influxdb

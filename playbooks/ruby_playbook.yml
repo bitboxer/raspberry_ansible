@@ -1,0 +1,44 @@
+---
+- name: Install ruby build dependencies
+  apt: name={{ item }} state=latest
+  with_items:
+    - git
+    - autoconf
+    - bison
+    - build-essential
+    - libssl-dev
+    - libyaml-dev
+    - libreadline6-dev
+    - zlib1g-dev
+    - libncurses5-dev
+    - libffi-dev
+    - libgdbm3
+    - libgdbm-dev
+- stat: path=~/.rbenv
+  register: rbenv_exist_rule
+- name: Install rbenv
+  command: "{{ item }}"
+  with_items:
+    - git clone https://github.com/rbenv/rbenv.git ~/.rbenv
+    - bash -c "cd ~/.rbenv && src/configure && make -C src"
+    - bash -c "echo 'export PATH=\"$HOME/.rbenv/bin:$PATH\"' >> ~/.bashrc"
+    - bash -c "echo 'eval \"$(rbenv init -)\"' >> ~/.bashrc"
+    - git clone https://github.com/rbenv/ruby-build.git ~/.rbenv/plugins/ruby-build
+  when: rbenv_exist_rule.stat.exists == false
+- name: Update rbenv
+  command: "{{ item }}"
+  with_items:
+    - bash -c "cd ~/.rbenv;git pull"
+    - bash -c "cd ~/.rbenv/plugins/ruby-build/;git pull"
+  when: rbenv_exist_rule.stat.exists == true
+- name: Check ruby version
+  stat: path=~/.rbenv/versions/{{ ruby_version }}
+  register: installed_ruby_version
+- name: Install ruby
+  # This limits the cpus used to compile to 1 to prevent
+  # segfaults and disables lots of options that just would
+  # take too long to compile
+  command: bash -c "MAKEOPTS=\"-j 1\" CONFIGURE_OPTS=\"-enable-shared --disable-install-doc --disable-install-rdoc --disable-install-capi\" ~/.rbenv/bin/rbenv install {{ ruby_version }}"
+  when: installed_ruby_version.stat.exists == false
+- name: Set current ruby
+  command: bash -c "~/.rbenv/bin/rbenv global {{ ruby_version }}"

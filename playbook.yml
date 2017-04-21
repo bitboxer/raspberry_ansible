@@ -4,18 +4,20 @@
     influxdb_version: 1.2.2
     influxdb_password: hous3inth3country
     grafana_version: 4.2.0
+    ruby_version: 2.4.1
   remote_user: pi
   become_user: root
   become: true
   tasks:
 
   ## Basic Setup ##
-  - name: Install vim
-    apt: name=vim state=latest
-  - name: Install unattended-upgrades
-    apt: name=unattended-upgrades state=latest
-  - name: Install apt-listchanges
-    apt: name=apt-listchanges state=latest
+  - name: Install base packages
+    apt: name={{ item }} state=latest
+    with_items:
+      - vim
+      - unattended-upgrades
+      - apt-listchanges
+      - htop
   - name: install bash aliases
     template:
       src: config/bash_aliases
@@ -23,57 +25,12 @@
       owner: pi
       group: pi
 
-  ### InfluxDB ##
-  - name: Check influxdb version number
-    command: bash -c "if [ -f /usr/bin/influx ]; then influx --version || grep {{ influxdb_version }}; fi"
-    register: current_influxdb_version
-  - name: Add influxdb group
-    group: name=influxdb state=present
-  - name: Add influxdb user
-    user: name=influxdb group=influxdb state=present
-  - name: create influxdb pid folder
-    file: path=/var/run/influxdb state=directory mode=0777
-  - name: Download and install influxdb
-    command: "{{ item }}"
-    with_items:
-      - wget https://dl.influxdata.com/influxdb/releases/influxdb-{{ influxdb_version }}_linux_armhf.tar.gz -O /tmp/influxdb.tar.gz
-      - "tar xvfz /tmp/influxdb.tar.gz --strip-components=2 -C /"
-      - rm /tmp/influxdb.tar.gz
-      - rm -rf /tmp/influxdb-{{ influxdb_version }}
-      - ln -s -f /usr/lib/influxdb/scripts/init.sh /etc/init.d/influxdb
-      - chmod +x /etc/init.d/influxdb
-      - chown -R influxdb:influxdb /var/lib/influxdb
-      - update-rc.d influxdb defaults
-      - update-rc.d influxdb enable
-      - /etc/init.d/influxdb start
-      - "influx -execute \"CREATE USER admin WITH PASSWORD \'{{ influxdb_password }}\' WITH ALL PRIVILEGES;\""
-    when: current_influxdb_version.stdout.find('InfluxDB') == -1
-  - name: install influxdb config
-    template:
-      src: config/influxdb.conf
-      dest: /etc/influxdb/influxdb.conf
-    notify:
-      - restart influxdb
-
-  ## grafana ##
-
-  - name: Check grafana version number
-    command: bash -c "if [ -f /usr/sbin/grafana-cli ]; then grafana-cli --version || grep {{ grafana_version }}; fi"
-    register: current_grafana_version
-  - name: Install adduser
-    apt: name=adduser state=latest
-  - name: Install libfontconfig
-    apt: name=libfontconfig state=latest
-  - name: Download and install grafana
-    command: "{{ item }}"
-    with_items:
-      - wget https://github.com/fg2it/grafana-on-raspberry/releases/download/v{{ grafana_version }}/grafana_{{ grafana_version }}_armhf.deb -O /tmp/grafana_{{ grafana_version }}_armhf.deb
-      - dpkg -i /tmp/grafana_{{ grafana_version }}_armhf.deb
-      - rm /tmp/grafana_{{ grafana_version }}_armhf.deb
-      - update-rc.d grafana-server defaults
-      - update-rc.d grafana-server enable
-      - service grafana-server start
-    when: current_grafana_version.stdout.find('Grafana') == -1
+  ## Playbooks ##
+  - include: playbooks/influxdb_playbook.yml
+  - include: playbooks/grafana_playbook.yml
+  - include: playbooks/ruby_playbook.yml
+    become_user: pi
+    become: true
 
   handlers:
     - name: restart influxdb
