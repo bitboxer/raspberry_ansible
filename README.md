@@ -4,6 +4,25 @@ This is the configuration for my Raspberry PI.
 
 ![Grafana interface](images/grafana.png)
 
+# List of things that get installed
+
+* [Ruby](http:/www.ruby-lang.org) 
+* [Grafana](http://grafana.org/) 
+* [InfluxDB](https://docs.influxdata.com/influxdb)
+* [vim](http://www.vim.org/)
+* [htop](http://hisham.hm/htop/)
+
+See into [playbook.yml](playbook.yml) for version
+numbers in the vars section. If there is non, the
+latest official raspbian package is used.
+
+This also activates unattended upgrades, the Raspberry
+will automatically update packages, but will not
+restart. You might want to do that manually for
+kernel patches.
+
+# How to use it
+
 Steps to install it on your machine:
 
 * Basic setup on the Raspberry Pi:
