@@ -2,6 +2,8 @@
 
 This is the configuration for my Raspberry PI.
 
+![Grafana interface](images/grafana.png)
+
 Steps to install it on your machine:
 
 * Install [NOOBS](https://github.com/procount/noobsconfig/) on the Raspberry
