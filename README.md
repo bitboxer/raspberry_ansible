@@ -13,9 +13,10 @@ This is the configuration for my Raspberry PI.
 * [htop](http://hisham.hm/htop/)
 * [borg backup](https://borgbackup.readthedocs.io/)
 
-See into [playbook.yml](playbook.yml) for version
-numbers in the vars section. If there is non, the
-latest official raspbian package is used.
+You can configure the version for the packages
+in the [config.yml](config_example.yml) file.
+If there is non, the latest official raspbian package
+is used.
 
 This also activates unattended upgrades, the Raspberry
 will automatically update packages, but will not
