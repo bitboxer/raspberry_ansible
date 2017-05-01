@@ -1,0 +1,26 @@
+---
+## Borg Backup
+
+# Enable the borg backup
+# this needs a remote server configured
+# correctly below
+borg_backup_enabled: false
+borg_remote_server: user@example.com
+borg_password: password
+
+# influx databases that are used in the backup
+borg_backup_influxdb:
+- luftdaten
+
+## Influx DB
+
+influxdb_version: 1.2.2
+influxdb_password: hous3inth3country
+
+## Grafana
+
+grafana_version: 4.2.0
+
+## Ruby
+
+ruby_version: 2.4.1

@@ -1,16 +1,14 @@
 ---
 - hosts: raspberry
-  vars:
-    influxdb_version: 1.2.2
-    influxdb_password: hous3inth3country
-    grafana_version: 4.2.0
-    ruby_version: 2.4.1
   remote_user: pi
   become_user: root
   become: true
   tasks:
 
   ## Basic Setup ##
+  - name: load config.yml
+    include_vars:
+      file: config.yml
   - name: Install base packages
     apt: name={{ item }} state=latest
     with_items:
@@ -31,6 +29,10 @@
   - include: playbooks/ruby_playbook.yml
     become_user: pi
     become: true
+  - include: playbooks/borg_backup_playbook.yml
+    become_user: pi
+    become: true
+    when: borg_backup_enabled == true
 
   handlers:
     - name: restart influxdb

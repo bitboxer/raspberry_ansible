@@ -1,0 +1,27 @@
+#!/bin/sh
+
+echo "backup to {{ borg_remote_server }}"
+
+mkdir -p ~/backup/influxdb
+
+influxd backup ~/backup/influxdb/
+{% for database in borg_backup_influxdb %}
+influxd backup --database {{ database }} ~/backup/influxdb/
+{% endfor %}
+
+REPOSITORY=/home/pi/borg_backup
+
+sudo BORG_PASSPHRASE='{{ borg_password }}' \
+    ~/borg-env/bin/borg create -v --stats       \
+    $REPOSITORY::'{hostname}-{now:%Y-%m-%d}'    \
+    /home/pi/backup/influxdb                    \
+    /var/lib/grafana                            \
+
+sudo BORG_PASSPHRASE='{{ borg_password }}' \
+    ~/borg-env/bin/borg prune -v --list $REPOSITORY --prefix '{hostname}-' \
+    --keep-daily=7 --keep-weekly=4 --keep-monthly=6
+
+sudo chown -R pi:pi borg_backup
+rsync -avz -e ssh ~/borg_backup {{ borg_remote_server }}:~/
+
+rm -rf ~/backup

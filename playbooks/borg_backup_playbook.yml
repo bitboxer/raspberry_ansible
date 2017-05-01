@@ -1,0 +1,48 @@
+---
+- name: Install borg dependencies
+  apt: name={{ item }} state=latest
+  with_items:
+    - python3
+    - python3-dev
+    - python3-pip
+    - python-virtualenv
+    - libssl-dev
+    - openssl
+    - libacl1-dev
+    - libacl1
+    - liblz4-dev
+    - liblz4-1
+    - build-essential
+- stat:
+    path: /home/pi/.ssh/id_rsa.pub
+  register: ssh_key
+- stat:
+    path: /home/pi/borg-env/bin/borg
+  register: borg_executable
+- name: Generate ssh key
+  command: "ssh-keygen -b 4096 -N '' -f ~/.ssh/id_rsa"
+  when: ssh_key.stat.exists == false
+- name: Download and install borg backup
+  command: "{{ item }}"
+  with_items:
+    - "bash -c \"virtualenv --python=python3 borg-env && source borg-env/bin/activate && pip install borgbackup\""
+    - "bash -c \"source borg-env/bin/activate && BORG_PASSPHRASE='{{ borg_password }}' borg init borg_backup\""
+  when: borg_executable.stat.exists == false
+- name : Update borg backup
+  command: "bash -c \"source borg-env/bin/activate && pip install -U borgbackup\""
+  when: borg_executable.stat.exists == true
+- name: Creates bin directory
+  file: path=/home/pi/bin state=directory
+- name: install borg backup script
+  template:
+    src: config/backup.sh.j2
+    dest: /home/pi/bin/backup.sh
+    owner: pi
+    group: pi
+    mode: u+x
+- cron:
+    name: "Backup files"
+    minute: "0"
+    hour: "2"
+    job: "bash -c ~/bin/backup.sh"
+    user: "pi"
