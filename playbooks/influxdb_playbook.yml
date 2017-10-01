@@ -1,6 +1,6 @@
 ---
 - name: Check influxdb version number
-  command: bash -c "if [ -f /usr/bin/influx ]; then influx --version || grep {{ influxdb_version }}; fi"
+  command: bash -c "if [ -f /usr/bin/influx ]; then influx --version | grep {{ influxdb_version }}; fi"
   register: current_influxdb_version
 - name: Add influxdb group
   group: name=influxdb state=present
