@@ -12,7 +12,7 @@
   command: "{{ item }}"
   with_items:
     - wget https://dl.influxdata.com/influxdb/releases/influxdb-{{ influxdb_version }}_linux_armhf.tar.gz -O /tmp/influxdb.tar.gz
-    - "tar xvfz /tmp/influxdb.tar.gz --strip-components=2 -C /"
+    - "tar xvfz /tmp/influxdb.tar.gz --strip-components=1 -C /"
     - rm /tmp/influxdb.tar.gz
     - rm -rf /tmp/influxdb-{{ influxdb_version }}
     - ln -s -f /usr/lib/influxdb/scripts/init.sh /etc/init.d/influxdb
